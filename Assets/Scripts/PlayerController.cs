@@ -7,6 +7,8 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
+ //inf jump boolean 
+ private bool onGround; 
  // Rigidbody of the player.
  private Rigidbody rb; 
 private int count;
@@ -26,18 +28,29 @@ private int count;
         rb = GetComponent<Rigidbody>();
         count = 0; 
         SetCountText();
+        onGround = false; 
     }
  
  // This function is called when a move input is detected.
- void OnMove(InputValue movementValue)
+ void OnMove(InputValue val)
     {
  // Convert the input value into a Vector2 for movement.
-        Vector2 movementVector = movementValue.Get<Vector2>();
+        Vector2 movementVector = val.Get<Vector2>();
 
+         Debug.Log("move"); 
  // Store the X and Y components of the movement.
         movementX = movementVector.x; 
         movementY = movementVector.y; 
     }
+
+   void OnJump(InputValue val)
+   {
+      Debug.Log("jumped");
+      if(!onGround)
+      {
+      rb.velocity = new Vector3(rb.velocity.x, 5, rb.velocity.z); 
+      }
+   }
 
    void SetCountText() 
    {
@@ -49,7 +62,6 @@ private int count;
     {
  // Create a 3D movement vector using the X and Y inputs.
         Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
-
  // Apply force to the Rigidbody to move the player.
         rb.AddForce(movement * speed); 
     }
@@ -61,5 +73,14 @@ private int count;
            count = count + 1;
            SetCountText();
        }
+        if(other.gameObject.CompareTag("Mesh"))
+        {
+         onGround = true; 
+        }
    }
+   void OnTriggerExit(Collider other) {
+        Debug.Log(other);
+        if(other.gameObject.CompareTag("Mesh"))
+        onGround = false;
+    }
 }
